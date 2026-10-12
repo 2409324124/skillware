@@ -16,6 +16,7 @@ Contributors add user-facing entries under `[Unreleased]` in the same PR. Mainta
 
 ### Changed
 
+- **Examples:** Renamed `examples/issue_resolver_github_context.py` to `examples/issue_resolver_common.py` to match the `*_common.py` helper module convention; updated imports in `claude_issue_resolver.py`, `gemini_issue_resolver.py`, and `ollama_issue_resolver.py`; removed `GRANDFATHERED_EXAMPLES` workaround from `tests/test_registry_docs.py` (#233).
 - **Typing:** `skillware/core/ui_schema.py` and `skillware/version_policy.py` are now type-clean and removed from the `[[tool.mypy.overrides]]` list, so `mypy skillware` checks them in CI (#415, Phase 1).
 
 ## [0.5.8] - 2026-10-07
