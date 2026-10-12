@@ -410,7 +410,7 @@ Commits that touched this skill bundle or its catalog page ([`dev_tools/issue_re
 
 | Commit | Description | Date | Version | Contributors |
 | :--- | :--- | :--- | :--- | :--- |
-| — | examples: rename issue_resolver_github_context to issue_resolver_common (#233) | 17 Sep 2026 | `0.3.0` | [@mashood-memon](https://github.com/mashood-memon) |
+| [`06fb035`](https://github.com/ARPAHLS/skillware/commit/06fb0359ef19ec32207908b8b80e4fe33ecae7b6) | examples(issue_resolver): rename shared helper to issue_resolver_common and remove GRANDFATHERED_EXAMPLES (#358) | 12 Oct 2026 | `0.3.0` | [@mashood-memon](https://github.com/mashood-memon) |
 | [`790787d`](https://github.com/ARPAHLS/skillware/commit/790787d0e72262ddfeb26f747f880012ca2b1ca6) | docs: five-provider Usage Examples guard and catalog loop backfill (#347) | 10 Sep 2026 | `0.3.0` | [@rosspeili](https://github.com/rosspeili) |
 | [`12fbd1a`](https://github.com/ARPAHLS/skillware/commit/12fbd1a11bdf66250008afc59df7048935eafc73) | docs: adopt Skill anatomy vocabulary on catalog page (#319) | 1 Sep 2026 | `0.3.0` | [@rosspeili](https://github.com/rosspeili) |
 | [`e90ba2f`](https://github.com/ARPAHLS/skillware/commit/e90ba2f) | chore(release): 0.4.8 — skills, profiles, version policy | 3 Aug 2026 | `0.3.0` | [@rosspeili](https://github.com/rosspeili) |

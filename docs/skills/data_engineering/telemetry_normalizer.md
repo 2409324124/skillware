@@ -282,7 +282,7 @@ Commits that touched this skill bundle or its catalog page ([`data_engineering/t
 
 | Commit | Description | Date | Version | Contributors |
 | :--- | :--- | :--- | :--- | :--- |
-| [`47f10a1`](https://github.com/ARPAHLS/skillware/commit/47f10a1) | feat(data_engineering): add telemetry_normalizer skill for sensor harmonization (#47) | 12 Oct 2026 | `0.1.0` | [@rin-katsuragi](https://github.com/rin-katsuragi) |
+| [`f9612e2`](https://github.com/ARPAHLS/skillware/commit/f9612e29ffe2cb0bb78798a8f42dc52840ef7f71) | feat(data_engineering): add telemetry_normalizer skill for sensor harmonization (#47) (#423) | 12 Oct 2026 | `0.1.0` | [@rin-katsuragi](https://github.com/rin-katsuragi) |
 <!-- skill-history:end -->
 
 ## Enterprise disclaimer
