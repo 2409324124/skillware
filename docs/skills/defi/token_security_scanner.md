@@ -326,6 +326,6 @@ Commits that touched this skill bundle or its catalog page ([`defi/token_securit
 
 | Commit | Description | Date | Version | Contributors |
 | :--- | :--- | :--- | :--- | :--- |
-| [`e14bcab`](https://github.com/ARPAHLS/skillware/commit/e14bcab69b2218e0a78e9b81ba363e3e5afca9b9) | feat(token_security_scanner): add operator policy and policy_action | 14 Oct 2026 | `0.2.0` | [@Hendobox](https://github.com/Hendobox) |
+| [`d7f721f`](https://github.com/ARPAHLS/skillware/commit/d7f721f0bd7519029902f65ac78b83cd64641015) | feat(token_security_scanner): operator policy and policy_action (#393) | 14 Oct 2026 | `0.2.0` | [@Hendobox](https://github.com/Hendobox) |
 | [`e90bbce`](https://github.com/ARPAHLS/skillware/commit/e90bbceadb360772cbe1f6cff16a9ec96c90a225) | feat(defi): token_security_scanner v0.1 (GoPlus read-only) (#368) | 26 Sep 2026 | `0.1.0` | [@Hendobox](https://github.com/Hendobox) |
 <!-- skill-history:end -->
