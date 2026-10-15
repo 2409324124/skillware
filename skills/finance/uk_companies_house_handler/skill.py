@@ -185,6 +185,8 @@ class UkCompaniesHouseHandlerSkill(BaseSkill):
                 or context.get("selected_transaction_id")
             )
             document_candidates = result.pop("_document_candidates", None)
+            if document_candidates is None and isinstance(result.get("context"), dict):
+                document_candidates = result["context"].get("document_candidates")
             if document_candidates is None:
                 document_candidates = context.get("document_candidates")
 
@@ -206,7 +208,8 @@ class UkCompaniesHouseHandlerSkill(BaseSkill):
                 return self._error_response(
                     "not_found",
                     "The requested resource was not found at "
-                    "Companies House. Check the company number.",
+                    "Companies House. Check the company number, "
+                    "transaction_id, or document metadata_url.",
                     context=context,
                 )
             if status_code == 429:
@@ -1302,9 +1305,35 @@ class UkCompaniesHouseHandlerSkill(BaseSkill):
             category = str(entry.get("category") or "")
 
         if not metadata_url and transaction_id:
-            # Fallback: Document API path uses the id segment; hosts may pass
-            # the filing transaction_id when it matches the document id.
-            metadata_url = f"{_DOCUMENT_API_BASE}/document/{transaction_id}"
+            # Filing transaction ids differ from Document API ids. Resolve the
+            # metadata link from the single filing-history item when possible.
+            company_number = str(
+                params.get("company_number") or context.get("company_number") or ""
+            ).strip()
+            if not company_number:
+                return self._error_response(
+                    "unknown_transaction_id",
+                    f"transaction_id '{transaction_id}' is not in "
+                    "context.document_candidates and no company_number is "
+                    "available to look it up. Call list_downloadable_documents "
+                    "first or pass metadata_url.",
+                    context=context,
+                )
+            item = self._request(
+                "GET",
+                f"/company/{company_number}/filing-history/{transaction_id}",
+            )
+            metadata_url = str(
+                (item.get("links") or {}).get("document_metadata") or ""
+            ).strip()
+            significant_date = significant_date or str(item.get("date") or "")
+            category = category or str(item.get("category") or "")
+            if not metadata_url:
+                return self._error_response(
+                    "document_unavailable",
+                    f"Filing '{transaction_id}' has no downloadable document.",
+                    context=context,
+                )
 
         if not metadata_url and not transaction_id:
             return self._error_response(
@@ -1467,13 +1496,24 @@ class UkCompaniesHouseHandlerSkill(BaseSkill):
         transaction_id: str = "",
         context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
-        mb_max = max_bytes / (1024 * 1024)
-        mb_actual = size_bytes / (1024 * 1024)
+        def _fmt(n: int) -> str:
+            if n >= 1024 * 1024:
+                return f"{n / (1024 * 1024):.1f} MB"
+            return f"{n} bytes"
+
+        if max_bytes >= _HARD_MAX_BYTES or size_bytes > _HARD_MAX_BYTES:
+            advice = (
+                "This exceeds the 10 MB hard ceiling; use include_content false "
+                "and share the download_url instead."
+            )
+        else:
+            advice = (
+                f"Set a higher max_bytes (up to {_fmt(_HARD_MAX_BYTES)}) or "
+                "retrieve metadata only."
+            )
         message = (
-            f"Document exceeds max_bytes limit of {mb_max:.1f} MB "
-            f"(actual: {mb_actual:.1f} MB). Set a higher max_bytes "
-            f"(up to {_HARD_MAX_BYTES / (1024 * 1024):.0f} MB) or "
-            "retrieve metadata only."
+            f"Document exceeds max_bytes limit of {_fmt(max_bytes)} "
+            f"(actual: {_fmt(size_bytes)}). {advice}"
         )
         response = self._error_response(
             "document_too_large",

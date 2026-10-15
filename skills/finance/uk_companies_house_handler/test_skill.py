@@ -2692,3 +2692,65 @@ def test_manifest_version_140(manifest):
     assert "list_downloadable_documents" in actions
     assert "get_document_metadata" in actions
     assert "fetch_document" in actions
+
+
+@patch("skills.finance.uk_companies_house_handler.skill.requests.request")
+def test_run_pipeline_keeps_document_candidates_in_context(mock_request, skill):
+    """Candidates from a pipeline list step survive the outer context merge."""
+    mock_request.return_value = _mock_response(_MOCK_FILINGS_WITH_DOCS)
+    result = skill.execute(
+        {
+            "action": "run_pipeline",
+            "company_number": "00102498",
+            "context": {"company_number": "00102498", "company_name": "BP P.L.C."},
+            "steps": [
+                {
+                    "action": "list_downloadable_documents",
+                    "params": {"company_number": "<from_resolve>"},
+                }
+            ],
+        }
+    )
+    assert result["status"] == "ready"
+    assert "tx-accounts-001" in result["context"]["document_candidates"]
+
+
+@patch("skills.finance.uk_companies_house_handler.skill.requests.request")
+def test_fetch_document_resolves_unknown_transaction_via_filing_item(
+    mock_request, skill
+):
+    """A transaction_id outside candidates is resolved via filing-history item."""
+    pdf = b"%PDF-1.7 tiny"
+    seen = []
+
+    def side_effect(method, url, **kwargs):
+        seen.append(url)
+        if url.endswith("/company/00102498/filing-history/tx-accounts-001"):
+            return _mock_response(_MOCK_FILINGS_WITH_DOCS["items"][0])
+        if url.endswith("/document/doc-accounts-001"):
+            return _mock_response(_MOCK_DOC_METADATA)
+        if url.endswith("/content"):
+            return _mock_response(
+                status=302, headers={"Location": "https://s3.example.com/x.pdf"}
+            )
+        if "s3.example.com" in url:
+            return _mock_response(status=200, raw=pdf)
+        raise AssertionError(url)
+
+    mock_request.side_effect = side_effect
+    result = skill.execute(
+        {
+            "action": "fetch_document",
+            "transaction_id": "tx-accounts-001",
+            "context": {"company_number": "00102498", "company_name": "BP P.L.C."},
+        }
+    )
+    assert result["status"] == "ready"
+    assert result["filename"] == "00102498_accounts_2024-03-15.pdf"
+    assert not any("/document/tx-accounts-001" in u for u in seen)
+
+
+def test_fetch_document_unknown_transaction_without_company(skill):
+    result = skill.execute({"action": "fetch_document", "transaction_id": "tx-x"})
+    assert result["status"] == "error"
+    assert result["error_code"] == "unknown_transaction_id"
