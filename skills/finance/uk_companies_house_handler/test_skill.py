@@ -2404,7 +2404,7 @@ def test_fetch_document_with_redirect_drops_auth(mock_request, skill):
                     "Location": "https://s3.example.com/presigned/doc.pdf?X-Amz=1"
                 },
             )
-        if "s3.example.com" in url:
+        if url.startswith("https://s3.example.com/"):
             assert kwargs.get("auth") is None
             assert "Authorization" not in (kwargs.get("headers") or {})
             return _mock_response(status=200, content=pdf_bytes, raw=pdf_bytes)
@@ -2497,7 +2497,7 @@ def test_fetch_document_oversize_during_stream(mock_request, skill):
                 status=302,
                 headers={"Location": "https://s3.example.com/big.pdf"},
             )
-        if "s3.example.com" in url:
+        if url.startswith("https://s3.example.com/"):
             return _mock_response(status=200, content=oversized, raw=oversized)
         raise AssertionError(url)
 
@@ -2733,7 +2733,7 @@ def test_fetch_document_resolves_unknown_transaction_via_filing_item(
             return _mock_response(
                 status=302, headers={"Location": "https://s3.example.com/x.pdf"}
             )
-        if "s3.example.com" in url:
+        if url.startswith("https://s3.example.com/"):
             return _mock_response(status=200, raw=pdf)
         raise AssertionError(url)
 

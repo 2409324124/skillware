@@ -107,7 +107,7 @@ def demo_skill() -> Iterator[Any]:
                 status=302,
                 headers={"Location": "https://s3.example.com/presigned/doc.pdf"},
             )
-        if "s3.example.com" in url:
+        if url.startswith("https://s3.example.com/"):
             assert kwargs.get("auth") is None
             return _resp(status=200, raw=PDF_BYTES)
         if url.endswith("/company/00102498"):
